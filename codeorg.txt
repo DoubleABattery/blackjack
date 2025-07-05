@@ -1,0 +1,211 @@
+//source for card images https://acbl.mybigcommerce.com/52-playing-cards/
+//source of image for back of card https://opengameart.org/content/colorful-poker-card-back
+var deckNames = getColumn("Card Deck","Name");
+var deckValues = getColumn("Card Deck","Value");
+var deckImages= getColumn("Card Deck","Image");
+var playerHandNames;
+var playerHandValues;
+var playerHandImages;
+var dealerHandValues;
+var dealerHandImages;
+var dealerHandNames;
+var playerTotal;
+var dealerTotal;
+var dealerWins = 0;
+var playerWins = 0;
+
+onEvent("playButton", "click", function( ) {
+  gameSetup();
+});
+onEvent("playAgain","click", function( ){
+  gameSetup();
+});
+onEvent("hitButton","click", function( ) {
+  playerTotal = hit(playerHandNames, playerHandValues, playerHandImages, playerTotal);
+  updateScreen();
+  if (playerTotal>21){
+    win("dealer");
+  }
+  else if (playerTotal == 21){
+    dealerTurn();
+  }
+});
+
+onEvent("standButton","click", function( ){
+  dealerTurn();
+});
+
+
+//"shuffles" the deck (randomizes items in all the lists)
+function shuffle(){
+  var tempDeckNames = [];
+  var tempDeckValues = [];
+  var tempDeckImages = [];
+  for(var i = 0; i<52; i++){
+    var k = randomNumber(0, deckNames.length-1);
+    appendItem(tempDeckNames, deckNames[k]);
+    removeItem(deckNames,k);
+    
+    appendItem(tempDeckValues, deckValues[k]);
+    removeItem(deckValues,k);
+    
+    appendItem(tempDeckImages, deckImages[k]);
+    removeItem(deckImages,k);
+  }
+  deckNames = tempDeckNames;
+  deckValues = tempDeckValues;
+  deckImages = tempDeckImages;
+}
+
+//function - deal
+//adds 2 cards to selected hand
+//parameters: handNames (list), handValues (list), handImages(list). player (string)
+function deal(handNames, handValues, handImages, player){
+  for(var i = 0; i<2; i++){
+    appendItem(handNames, deckNames[deckNames.length-1]);
+    removeItem(deckNames, deckNames.length-1);
+    appendItem(handValues, deckValues[deckValues.length-1]);
+    removeItem(deckValues, deckValues.length-1);
+    appendItem(handImages, deckImages[deckImages.length-1]);
+    removeItem(deckImages, deckImages.length-1);
+  }
+  if (handNames[0]=="ace" && handNames[1] == "ace"){
+    handValues[0] == 11;
+    handValues[0] == 1;
+  }
+  if (player == "player"){
+    playerHandNames = handNames;
+    playerHandValues = handValues;
+    playerHandImages = handImages;
+  } else {
+    dealerHandNames = handNames;
+    dealerHandValues = handValues;
+    dealerHandImages = handImages;
+  }
+  return handValues[0]+handValues[1];
+  
+  
+}
+
+//adds card to hand 
+function hit(handNames, handValues, handImages, total){
+  appendItem(handNames, deckNames[deckNames.length-1]);
+  removeItem(deckNames, deckNames.length-1);
+  appendItem(handValues, deckValues[deckValues.length-1]);
+  removeItem(deckValues, deckValues.length-1);
+  appendItem(handImages, deckImages[deckImages.length-1]);
+  removeItem(deckImages, deckImages.length-1);
+  if (handNames[handNames.length-1]=="Ace" && total>=11){
+    handValues[handValues.length-1]=1;
+  } 
+  for (var i = 0; i<handNames.length; i++){
+    if ((handNames[i] == "Ace") && (total+handValues[handValues.length-1]>21)){
+      handValues[i] = 1;
+    }
+  }
+  total = 0;
+  for (var j = 0; j<handValues.length; j++){
+    total += handValues[j];
+  }
+  return total;
+}
+
+//updates images and total for the player
+function updateScreen(){
+  for (var i = 0; i<playerHandNames.length;i++){
+    setImageURL("playerCard"+i,playerHandImages[i]);
+  }
+  setNumber("playerValue",playerTotal);
+}
+
+//start of the game, resets from previous round
+function gameSetup(){
+  for (var i = 0; i<7;i++){
+    setImageURL("playerCard"+i,"");
+    setImageURL("dealerCard"+i,"");
+  }
+  setScreen("game");
+  hideElement("playerWon");
+  hideElement("dealerWon");
+  hideElement("tieLabel");
+  hideElement("playAgain");
+  showElement("hitButton");
+  showElement("standButton");
+  deckNames = getColumn("Card Deck","Name");
+  deckValues = getColumn("Card Deck","Value");
+  deckImages= getColumn("Card Deck","Image");
+  playerHandNames = [];
+  playerHandValues = [];
+  playerHandImages = [];
+  dealerHandValues = [];
+  dealerHandImages = [];
+  dealerHandNames = [];
+  playerTotal = 0;
+  dealerTotal = 0;
+  setNumber("dealerValue","");
+  
+  shuffle();
+  playerTotal =  deal(playerHandNames, playerHandValues, playerHandImages, "player");
+  dealerTotal = deal(dealerHandNames, dealerHandValues, dealerHandImages, "dealer");
+  updateScreen();
+  
+  setImageURL("dealerCard0","https://studio.code.org/v3/assets/WDoXVLxEz94-WR5ARtY9QM1rYjz3UaFGVWdih-wYB20/backofcard.png?t=1713188390000");
+  setImageURL("dealerCard1",dealerHandImages[1]);
+  
+  if (playerTotal == 21 && dealerTotal == 21){
+    setText("dealerValue",dealerTotal);
+    setImageURL("dealerCard0",dealerHandImages[0]);
+    win("tie");
+  } else if (dealerTotal == 21){
+    setImageURL("dealerCard0",dealerHandImages[0]);
+    setText("dealerValue",dealerTotal);
+    win("dealer");
+  } else if (playerTotal == 21){
+    win("player");
+  }
+}
+
+//dealer's turn and win conditions
+function dealerTurn(){
+  hideElement("hitButton");
+  hideElement("standButton");
+  setImageURL("dealerCard0",dealerHandImages[0]);
+  while (dealerTotal<17){
+    dealerTotal = hit(dealerHandNames, dealerHandValues, dealerHandImages, dealerTotal);
+  }
+  for (var i = 0; i<dealerHandNames.length;i++){
+    setImageURL("dealerCard"+i,dealerHandImages[i]);
+  }
+  setNumber("dealerValue",dealerTotal);
+  if (playerTotal == dealerTotal){
+    win("tie");
+  } else if (dealerTotal>21){
+    win("player");
+  } else if (playerTotal > dealerTotal){
+    win("player");
+  } else if (playerTotal<dealerTotal){
+    win("dealer");
+  }
+}
+
+//function for showing who won and adding to total wins
+function win(winner){
+  showElement("playAgain");
+  hideElement("hitButton");
+  hideElement("standButton");
+  if (winner == "player"){
+    showElement("playerWon");
+    playerWins += 1;
+    setNumber("playerWinsLabel",playerWins);
+  } else if (winner == "dealer"){
+    showElement("dealerWon");
+    dealerWins += 1;
+    setNumber("dealerWinsLabel", dealerWins);
+  } else {
+    showElement("tieLabel");
+    dealerWins += 1;
+    playerWins += 1;
+    setNumber("playerWinsLabel",playerWins);
+    setNumber("dealerWinsLabel",dealerWins);
+  }
+}
