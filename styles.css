@@ -126,6 +126,19 @@ img{
     max-width: 1200px;
 }
 
+.win-message{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.player-won{
+    background-color: var(--success);
+}
+
+.dealer-won{
+    background-color: var(--danger);
+}
+
 .player-side{
     display: flex;
     flex-direction: row;
@@ -143,7 +156,7 @@ img{
     width: 100px;
 }
 
-.center-container button {
+.center-container button, .win-message {
     padding: 10px 20px;
     border: none;
     border-radius: 10px;
