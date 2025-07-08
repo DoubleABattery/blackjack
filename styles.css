@@ -126,6 +126,23 @@ img{
     max-width: 1200px;
 }
 
+.game-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    row-gap: 5px;
+}
+
+.play-again {
+    color: var(--text);
+    cursor: pointer;
+}
+
+.play-again:hover {
+    color: var(--primary);
+}
+
 .win-message{
     opacity: 0;
     pointer-events: none;
@@ -137,6 +154,10 @@ img{
 
 .dealer-won{
     background-color: var(--danger);
+}
+
+.tie{
+    background-color: var(--info);
 }
 
 .player-side{
@@ -154,6 +175,15 @@ img{
 .hit-button {
     background-color: var(--primary);
     width: 100px;
+}
+
+.hidden{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.shown{
+    opacity: 1;
 }
 
 .center-container button, .win-message {
