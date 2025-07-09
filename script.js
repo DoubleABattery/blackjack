@@ -108,23 +108,34 @@ document.querySelector('.play').addEventListener('click', function() {
         </div>
     `;
 
-    document.querySelector('.play-again').addEventListener('click', function() {
-        document.querySelector('.play-again').classList.add('hidden');
-        document.querySelector('.hit-button').classList.remove('hidden');
-        document.querySelector('.stand-button').classList.remove('hidden');
-        document.querySelector('.win-message').classList.remove('shown');
-        document.querySelector('.win-message').classList.remove('player-won');
-        document.querySelector('.win-message').classList.remove('dealer-won');
-        document.querySelector('.win-message').classList.remove('tie');
+    const play_again = document.querySelector('.play-again');
+    const hit_button = document.querySelector('.hit-button');
+    const stand_button = document.querySelector('.stand-button');
+    const win_message = document.querySelector('.win-message');
+    const dealer_total = document.getElementById('dealer-total');
+    const player_total = document.getElementById('player-total');
+    const player_wins = document.getElementById('player-wins');
+    const dealer_wins = document.getElementById('dealer-wins');
+    const dealer_card0 = document.getElementById("dealer-card0");
+    const dealer_card1 = document.getElementById("dealer-card1");
+
+    play_again.addEventListener('click', function() {
+        play_again.classList.add('hidden');
+        hit_button.classList.remove('hidden');
+        stand_button.classList.remove('hidden');
+        win_message.classList.remove('shown');
+        win_message.classList.remove('player-won');
+        win_message.classList.remove('dealer-won');
+        win_message.classList.remove('tie');
         playerTotal = 0;
         dealerTotal = 0;
         playerHand = [];
         dealerHand = [];
-        document.getElementById('dealer-total').innerHTML = "??";
+        dealer_total.innerHTML = "??";
         gameSetup();
     });
 
-    document.querySelector('.hit-button').addEventListener('click', function() {
+    hit_button.addEventListener('click', function() {
         playerTotal = hit(playerHand, playerTotal);
         updateScreen();
         if (playerTotal > 21) {
@@ -134,140 +145,138 @@ document.querySelector('.play').addEventListener('click', function() {
         }
     });
 
-    document.querySelector('.stand-button').addEventListener('click', function() {
+    stand_button.addEventListener('click', function() {
         dealerTurn();
     });
     
     gameSetup();
 
+    function shuffle(){
+        var tempDeck = [];
+        for(var i = 0; i<52; i++){
+            var k = Math.floor(Math.random() * gameDeck.length);
+            tempDeck.push(gameDeck[k]);
+            gameDeck.splice(k,1);
+        }
+        gameDeck = tempDeck;
+    }
+
+    function deal(hand, player){
+        for(var i = 0; i<2; i++){
+            hand.push(gameDeck.pop());
+        }
+        if (hand[0].name=="ace" && hand[1].name == "ace"){
+            hand[0].value = 11;
+            hand[1].value = 1;
+        }
+        if (player == "player"){
+            playerHand = hand;
+        } else {
+            dealerHand = hand;
+        }
+        return hand[0].value + hand[1].value;
+    }
+
+    function hit(hand, total){
+        hand.push(gameDeck.pop());
+        if (hand[hand.length-1].name=="Ace" && total>=11){
+            hand[hand.length-1].value = 1;
+        } 
+        for (var i = 0; i<hand.length; i++){
+            if ((hand[i].name == "Ace") && (total+hand[hand.length-1].value>21)){
+            hand[i].value = 1;
+            }
+        }
+        total = 0;
+        for (var j = 0; j<hand.length; j++){
+            total += hand[j].value;
+        }
+        return total;
+    }
+
+    function updateScreen(){
+        for (var i = 0; i<playerHand.length;i++){
+            document.getElementById("player-card"+i).innerHTML = `<img src="${playerHand[i].image}">`;
+        }
+        player_total.innerHTML = playerTotal;
+    }
+
+    function gameSetup(){
+        for (var i = 0; i<8;i++){
+            document.getElementById("player-card"+i).innerHTML = '';
+            document.getElementById("dealer-card"+i).innerHTML = '';
+        }
+
+        gameDeck = structuredClone(deck);
+        
+        shuffle();
+        playerTotal =  deal(playerHand, "player");
+        dealerTotal = deal(dealerHand, "dealer");
+        updateScreen();
+
+        dealer_card0.innerHTML = `<img src="cardback.png">`;
+        dealer_card1.innerHTML = `<img src="${dealerHand[1].image}">`;
+
+        if (playerTotal == 21 && dealerTotal == 21){
+            dealer_total.innerHTML = dealerTotal
+            dealer_card1.innerHTML = `<img src="${dealerHand[0].image}">`;
+            win("tie");
+        } else if (dealerTotal == 21){
+            dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
+            dealer_total.innerHTML = dealerTotal;
+            win("dealer");
+        } else if (playerTotal == 21){
+            win("player");
+        }
+    }
+
+    function dealerTurn(){
+        hit_button.classList.add('hidden');
+        stand_button.classList.add('hidden');
+        dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
+        while (dealerTotal<17){
+            dealerTotal = hit(dealerHand, dealerTotal);
+        }
+        for (var i = 0; i<dealerHand.length;i++){
+            document.getElementById("dealer-card"+i).innerHTML = `<img src="${dealerHand[i].image}">`;
+        }
+        dealer_total.innerHTML = dealerTotal;
+        if (playerTotal == dealerTotal){
+            win("tie");
+        } else if (dealerTotal>21){
+            win("player");
+        } else if (playerTotal > dealerTotal){
+            win("player");
+        } else if (playerTotal<dealerTotal){
+            win("dealer");
+        }
+    }
+
+    function win(winner){    
+        play_again.classList.remove('hidden');
+        hit_button.classList.add('hidden');
+        stand_button.classList.add('hidden');
+        win_message.classList.add('shown');
+        if (winner == "player"){
+            win_message.innerHTML = "You won!";
+            win_message.classList.add('player-won');
+            playerWins += 1;
+            player_wins.innerHTML = playerWins;
+        } else if (winner == "dealer"){
+            win_message.innerHTML = "You lost!";
+            win_message.classList.add('dealer-won');
+            dealerWins += 1;
+            dealer_wins.innerHTML = dealerWins;
+        } else {
+            win_message.innerHTML = "Tie";
+            win_message.classList.add('tie');
+            dealerWins += 1;
+            playerWins += 1;
+            player_wins.innerHTML = playerWins;
+            dealer_wins.innerHTML = dealerWins;
+        }
+    }
 });
 
 
 
-function shuffle(){
-  var tempDeck = [];
-  for(var i = 0; i<52; i++){
-    var k = Math.floor(Math.random() * gameDeck.length);
-    tempDeck.push(gameDeck[k]);
-    gameDeck.splice(k,1);
-  }
-  gameDeck = tempDeck;
-}
-
-function deal(hand, player){
-  for(var i = 0; i<2; i++){
-    hand.push(gameDeck.pop());
-  }
-  if (hand[0].name=="ace" && hand[1].name == "ace"){
-    hand[0].value = 11;
-    hand[1].value = 1;
-  }
-  if (player == "player"){
-    playerHand = hand;
-  } else {
-    dealerHand = hand;
-  }
-  return hand[0].value + hand[1].value;
-}
-
-function hit(hand, total){
-  hand.push(gameDeck.pop());
-  if (hand[hand.length-1].name=="Ace" && total>=11){
-    hand[hand.length-1].value = 1;
-  } 
-  for (var i = 0; i<hand.length; i++){
-    if ((hand[i].name == "Ace") && (total+hand[hand.length-1].value>21)){
-      hand[i].value = 1;
-    }
-  }
-  total = 0;
-  for (var j = 0; j<hand.length; j++){
-    total += hand[j].value;
-  }
-  return total;
-}
-
-function updateScreen(){
-  for (var i = 0; i<playerHand.length;i++){
-    document.getElementById("player-card"+i).innerHTML = `<img src="${playerHand[i].image}">`;
-  }
-  document.getElementById("player-total").innerHTML = playerTotal;
-}
-
-function gameSetup(){
-  for (var i = 0; i<8;i++){
-    document.getElementById("player-card"+i).innerHTML = '';
-    document.getElementById("dealer-card"+i).innerHTML = '';
-  }
-
-  gameDeck = structuredClone(deck);
-  console.log(gameDeck);
-  
-  shuffle();
-  playerTotal =  deal(playerHand, "player");
-  dealerTotal = deal(dealerHand, "dealer");
-  updateScreen();
-  
-  document.getElementById("dealer-card0").innerHTML = `<img src="cardback.png">`;
-  document.getElementById("dealer-card1").innerHTML = `<img src="${dealerHand[1].image}">`;
-
-  if (playerTotal == 21 && dealerTotal == 21){
-    document.getElementById('dealer-total').innerHTML = dealerTotal
-    document.getElementById("dealer-card1").innerHTML = `<img src="${dealerHand[0].image}">`;
-    win("tie");
-  } else if (dealerTotal == 21){
-    document.getElementById("dealer-card0").innerHTML = `<img src="${dealerHand[0].image}">`;
-    document.getElementById("dealer-total").innerHTML = dealerTotal;
-    win("dealer");
-  } else if (playerTotal == 21){
-    win("player");
-  }
-}
-
-function dealerTurn(){
-  document.querySelector('.hit-button').classList.add('hidden');
-  document.querySelector('.stand-button').classList.add('hidden');
-  document.getElementById("dealer-card0").innerHTML = `<img src="${dealerHand[0].image}">`;
-  while (dealerTotal<17){
-    dealerTotal = hit(dealerHand, dealerTotal);
-  }
-  for (var i = 0; i<dealerHand.length;i++){
-    document.getElementById("dealer-card"+i).innerHTML = `<img src="${dealerHand[i].image}">`;
-  }
-  document.getElementById("dealer-total").innerHTML = dealerTotal;
-  if (playerTotal == dealerTotal){
-    win("tie");
-  } else if (dealerTotal>21){
-    win("player");
-  } else if (playerTotal > dealerTotal){
-    win("player");
-  } else if (playerTotal<dealerTotal){
-    win("dealer");
-  }
-}
-
-function win(winner){
-    win_message = document.querySelector('.win-message');     
-    document.querySelector('.play-again').classList.remove('hidden');
-    document.querySelector('.hit-button').classList.add('hidden');
-    document.querySelector('.stand-button').classList.add('hidden');
-    win_message.classList.add('shown');
-    if (winner == "player"){
-        win_message.innerHTML = "You won!";
-        win_message.classList.add('player-won');
-        playerWins += 1;
-        document.getElementById('player-wins').innerHTML = playerWins;
-    } else if (winner == "dealer"){
-        win_message.innerHTML = "You lost!";
-        win_message.classList.add('dealer-won');
-        dealerWins += 1;
-        document.getElementById('dealer-wins').innerHTML = dealerWins;
-    } else {
-        win_message.innerHTML = "Tie";
-        win_message.classList.add('tie');
-        dealerWins += 1;
-        playerWins += 1;
-        document.getElementById('player-wins').innerHTML = playerWins;
-        document.getElementById('dealer-wins').innerHTML = dealerWins;
-    }
-}
