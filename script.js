@@ -165,7 +165,7 @@ document.querySelector('.play').addEventListener('click', function() {
         for(var i = 0; i<2; i++){
             hand.push(gameDeck.pop());
         }
-        if (hand[0].name=="ace" && hand[1].name == "ace"){
+        if (hand[0].name=="A" && hand[1].name == "A"){
             hand[0].value = 11;
             hand[1].value = 1;
         }
@@ -179,12 +179,12 @@ document.querySelector('.play').addEventListener('click', function() {
 
     function hit(hand, total){
         hand.push(gameDeck.pop());
-        if (hand[hand.length-1].name=="Ace" && total>=11){
+        if (hand[hand.length-1].name=="A" && total>=11){
             hand[hand.length-1].value = 1;
         } 
         for (var i = 0; i<hand.length; i++){
-            if ((hand[i].name == "Ace") && (total+hand[hand.length-1].value>21)){
-            hand[i].value = 1;
+            if ((hand[i].name == "A") && (total+hand[hand.length-1].value>21)){
+                hand[i].value = 1;
             }
         }
         total = 0;
