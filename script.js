@@ -233,23 +233,26 @@ document.querySelector('.play').addEventListener('click', function() {
     function dealerTurn(){
         hit_button.classList.add('hidden');
         stand_button.classList.add('hidden');
-        dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
-        while (dealerTotal<17){
-            dealerTotal = hit(dealerHand, dealerTotal);
-        }
-        for (var i = 0; i<dealerHand.length;i++){
-            document.getElementById("dealer-card"+i).innerHTML = `<img src="${dealerHand[i].image}">`;
-        }
         dealer_total.innerHTML = dealerTotal;
-        if (playerTotal == dealerTotal){
-            win("tie");
-        } else if (dealerTotal>21){
-            win("player");
-        } else if (playerTotal > dealerTotal){
-            win("player");
-        } else if (playerTotal<dealerTotal){
-            win("dealer");
-        }
+        dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
+        let i = 2;
+        const hitInterval = setInterval(() => { 
+            if (dealerTotal >= 17){
+                clearInterval(hitInterval);
+                if (playerTotal == dealerTotal){
+                    win("tie");
+                } else if (dealerTotal>21 || dealerTotal < playerTotal){
+                    win("player");
+                } else if (playerTotal<dealerTotal){
+                    win("dealer");
+                }
+            } else {
+                dealerTotal = hit(dealerHand, dealerTotal);
+                dealer_total.innerHTML = dealerTotal;
+                document.getElementById("dealer-card"+i).innerHTML = `<img src="${dealerHand[i].image}">`;
+                i++;
+            }
+        }, 1000);  
     }
 
     function win(winner){    
@@ -277,6 +280,3 @@ document.querySelector('.play').addEventListener('click', function() {
         }
     }
 });
-
-
-
