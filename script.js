@@ -1,4 +1,5 @@
 const main = document.querySelector("main");
+
 const deck = [
     {name: "2", value: 2, image: "cards/2C.png"},
     {name: "2", value: 2, image: "cards/2D.png"},
@@ -62,52 +63,16 @@ var dealerTotal;
 var dealerWins = 0;
 var playerWins = 0;
 
-document.querySelector('.play').addEventListener('click', function() {
+document.querySelector('.play').addEventListener('click', async function() {
+    main.innerHTML = '';
     main.classList.remove('start');
     main.classList.add('game');
-    main.innerHTML = `
-        <div class="game">
-            <div class="dealer-cards-container">
-                <div id="dealer-card0" class="dealer-card"><img src="cardback.png"></div>
-                <div id="dealer-card1" class="dealer-card"><img src="cardback.png"></div>
-                <div id="dealer-card2" class="dealer-card"><img src="cardback.png"></div>
-                <div id="dealer-card3" class="dealer-card"><img src="cardback.png"></div>
-                <div id="dealer-card4" class="dealer-card"><img src="cardback.png"></div>
-                <div id="dealer-card5" class="dealer-card"><img src="cardback.png"></div>
-                <div id="dealer-card6" class="dealer-card"><img src="cardback.png"></div>
-                <div id="dealer-card7" class="dealer-card"><img src="cardback.png"></div>
-            </div>
-
-            <div class="center-container">
-                <div class="dealer-total">Dealer Total: <span id="dealer-total">??</span></div>
-                <div class="wins-counter">
-                    <div>Your Wins: <span id="player-wins">0</span></div>
-                    <div class="game-result">
-                        <div class="win-message"></div>
-                        <div class="play-again hidden">Play Again</div>
-                    </div>
-                    <div>Dealer Wins: <span id="dealer-wins">0</span></div>
-                </div>
-                <div class="player-side">
-                    <button class="hit-button">Hit</button>
-                    <div class="player-total">Player Total: <span id="player-total">??</span></div>
-                    <button class="stand-button">Stand</button>
-                </div>
-            </div>
-
-            <div class="player-cards-container">
-                <div id="player-card0" class="player-card"><img src="cardback.png"></div>
-                <div id="player-card1" class="player-card"><img src="cardback.png"></div>
-                <div id="player-card2" class="player-card"><img src="cardback.png"></div>
-                <div id="player-card3" class="player-card"><img src="cardback.png"></div>
-                <div id="player-card4" class="player-card"><img src="cardback.png"></div>
-                <div id="player-card5" class="player-card"><img src="cardback.png"></div>
-                <div id="player-card6" class="player-card"><img src="cardback.png"></div>
-                <div id="player-card7" class="player-card"><img src="cardback.png"></div> 
-            </div>
-        </div>
-    `;
-
+    await (async () => {
+        const response = await fetch('game.html');
+        const html = await response.text();
+        main.innerHTML = html;
+    })();
+    
     const play_again = document.querySelector('.play-again');
     const hit_button = document.querySelector('.hit-button');
     const stand_button = document.querySelector('.stand-button');
@@ -233,6 +198,10 @@ document.querySelector('.play').addEventListener('click', function() {
     function dealerTurn(){
         hit_button.classList.add('hidden');
         stand_button.classList.add('hidden');
+        setTimeout(dealerHit, 1000);
+    }
+
+    function dealerHit(){
         dealer_total.innerHTML = dealerTotal;
         dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
         let i = 2;

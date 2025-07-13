@@ -74,7 +74,7 @@ button:hover {
 }
 
 footer {
-    position: absolute;
+    position: relative;
     bottom: -1;
     left: 0;
     right: 0;
