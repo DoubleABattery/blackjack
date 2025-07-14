@@ -244,6 +244,7 @@ document.querySelector('.play').addEventListener('click', async function() {
             dealer_wins.innerHTML = dealerWins;
         } else {
             win_message.classList.add('tie');
+            win_message.innerHTML = "Tie!";
             dealerWins += 1;
             playerWins += 1;
             player_wins.innerHTML = playerWins;
