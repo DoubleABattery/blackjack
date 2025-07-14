@@ -83,6 +83,7 @@ document.querySelector('.play').addEventListener('click', async function() {
     const dealer_wins = document.getElementById('dealer-wins');
     const dealer_card0 = document.getElementById("dealer-card0");
     const dealer_card1 = document.getElementById("dealer-card1");
+    const blackjack_message = document.querySelector('.blackjack-message');
 
     play_again.addEventListener('click', function() {
         play_again.classList.add('hidden');
@@ -92,6 +93,7 @@ document.querySelector('.play').addEventListener('click', async function() {
         win_message.classList.remove('player-won');
         win_message.classList.remove('dealer-won');
         win_message.classList.remove('tie');
+        blackjack_message.innerHTML = '';
         playerTotal = 0;
         dealerTotal = 0;
         playerHand = [];
@@ -192,6 +194,7 @@ document.querySelector('.play').addEventListener('click', async function() {
             win("dealer");
         } else if (playerTotal == 21){
             win("player");
+            blackjack_message.innerHTML = "Blackjack!";
         }
     }
 
@@ -240,7 +243,6 @@ document.querySelector('.play').addEventListener('click', async function() {
             dealerWins += 1;
             dealer_wins.innerHTML = dealerWins;
         } else {
-            win_message.innerHTML = "Tie";
             win_message.classList.add('tie');
             dealerWins += 1;
             playerWins += 1;

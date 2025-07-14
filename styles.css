@@ -13,6 +13,9 @@
     --warning: hsl(52 19% 57%);
     --success: hsl(146 17% 59%);
     --info: hsl(217 28% 65%);
+    --border-card: solid 1px var(--border-muted);
+    --shadow: 0px 2px 2px oklch(0 0 0 / 0.2), 0px 4px 4px oklch(0 0 0 / 0.1);
+    --gradient: linear-gradient(0deg, var(--bg) 97%, var(--bg-light));
 }
 
 body.light {
@@ -36,7 +39,7 @@ body {
     background-color: var(--bg-dark);
     color: var(--text);
     font-family: "Manrope", sans-serif;
-    margin: 0;
+    margin: 10px;
     padding: 0;
     font-size: 1.5em;
 }
@@ -121,9 +124,15 @@ img{
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
     width: 100%;
-    max-width: 1200px;
+    max-width: 700px;
+    background: var(--gradient);
+    border: var(--border-card);
+    border-top: 1px solid var(--highlight);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    padding: 13px 1.5vw;
 }
 
 .game-result {
@@ -166,6 +175,32 @@ img{
     align-items: center;
     justify-content: center;
     column-gap: 20px;
+}
+
+.blackjack-message {
+    background: linear-gradient(
+    270deg,
+    var(--text),
+    var(--primary),
+    var(--text),
+    var(--primary)
+    );
+    background-size: 300% 300%;
+    background-clip: text;
+    color: transparent;
+    animation: logo-gradient 1.3s linear infinite;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+@keyframes logo-gradient{
+    0% {
+    background-position: 100% 100%;
+  }
+ 
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .stand-button {
