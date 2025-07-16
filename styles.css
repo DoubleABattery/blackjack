@@ -180,6 +180,14 @@ img{
     column-gap: 20px;
 }
 
+.bust{
+    color: var(--danger);
+}
+
+.blackjack {
+    color: var(--primary);
+}
+
 .blackjack-message {
     background: linear-gradient(
     270deg,
@@ -231,4 +239,3 @@ img{
     color: var(--text);
     font-size: 1em;
 }
-

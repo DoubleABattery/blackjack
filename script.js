@@ -93,6 +93,7 @@ document.querySelector('.play').addEventListener('click', async function() {
         win_message.classList.remove('player-won');
         win_message.classList.remove('dealer-won');
         win_message.classList.remove('tie');
+        player_total.classList = [];
         blackjack_message.innerHTML = '';
         playerTotal = 0;
         dealerTotal = 0;
@@ -107,6 +108,8 @@ document.querySelector('.play').addEventListener('click', async function() {
         updateScreen();
         if (playerTotal > 21) {
             win("dealer");
+            player_total.classList.add('bust');
+            showDealerCard();
         } else if (playerTotal == 21) {
             dealerTurn();
         }
@@ -168,6 +171,11 @@ document.querySelector('.play').addEventListener('click', async function() {
         player_total.innerHTML = playerTotal;
     }
 
+    function showDealerCard(){
+        dealer_card1.innerHTML = `<img src="${dealerHand[1].image}">`;
+        dealer_total.innerHTML = dealerTotal;
+    }
+
     function gameSetup(){
         for (var i = 0; i<8;i++){
             document.getElementById("player-card"+i).innerHTML = '';
@@ -181,20 +189,19 @@ document.querySelector('.play').addEventListener('click', async function() {
         dealerTotal = deal(dealerHand, "dealer");
         updateScreen();
 
-        dealer_card0.innerHTML = `<img src="cardback.png">`;
-        dealer_card1.innerHTML = `<img src="${dealerHand[1].image}">`;
+        dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
+        dealer_card1.innerHTML = `<img src="cardback.png">`;
 
         if (playerTotal == 21 && dealerTotal == 21){
-            dealer_total.innerHTML = dealerTotal
-            dealer_card1.innerHTML = `<img src="${dealerHand[0].image}">`;
+            showDealerCard();
             win("tie");
         } else if (dealerTotal == 21){
-            dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
-            dealer_total.innerHTML = dealerTotal;
+            showDealerCard();
             win("dealer");
         } else if (playerTotal == 21){
             win("player");
             blackjack_message.innerHTML = "Blackjack!";
+            player_total.classList.add('blackjack');
         }
     }
 
@@ -205,8 +212,7 @@ document.querySelector('.play').addEventListener('click', async function() {
     }
 
     function dealerHit(){
-        dealer_total.innerHTML = dealerTotal;
-        dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
+        showDealerCard();
         let i = 2;
         const hitInterval = setInterval(() => { 
             if (dealerTotal >= 17){
