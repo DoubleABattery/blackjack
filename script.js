@@ -60,8 +60,9 @@ var playerHand = [];
 var dealerHand = [];
 var playerTotal;
 var dealerTotal; 
-var dealerWins = 0;
-var playerWins = 0;
+var chipsAmount = 700;
+var potAmount = 0;
+var gotBlackjack = false;
 
 document.querySelector('.play').addEventListener('click', async function() {
     main.innerHTML = '';
@@ -79,20 +80,78 @@ document.querySelector('.play').addEventListener('click', async function() {
     const win_message = document.querySelector('.win-message');
     const dealer_total = document.getElementById('dealer-total');
     const player_total = document.getElementById('player-total');
-    const player_wins = document.getElementById('player-wins');
-    const dealer_wins = document.getElementById('dealer-wins');
+    const player_side = document.querySelector('.player-side');
+    const chips = document.getElementById('chips');
+    const pot = document.getElementById('pot');
+    const betting = document.querySelector('.betting');
+    const bet_button = document.querySelector('.bet-button');
+    const slider = document.querySelector('.slider');
+    const textInput = document.querySelector('.text')
     const dealer_card0 = document.getElementById("dealer-card0");
     const dealer_card1 = document.getElementById("dealer-card1");
     const blackjack_message = document.querySelector('.blackjack-message');
+    
+    const double_down = document.createElement('button');
+    double_down.classList.add('double-down-button');
+    double_down.innerHTML = 'Double Down';
+    
+    toggleRoundUI("hide");
+
+    slider.oninput = () => {
+        document.getElementById("bet-amount").innerHTML = slider.value;
+        textInput.value = slider.value
+    }
+
+    textInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter'){
+            textInput.blur();
+        }
+    });
+
+    textInput.addEventListener('blur', function() {
+        let value = Math.ceil(textInput.value);
+        if (value>chipsAmount){
+            textInput.value=chipsAmount
+        } else if (value<1){
+            textInput.value=1
+        }
+        document.getElementById("bet-amount").innerHTML = textInput.value;
+        slider.value = textInput.value;
+    });
+
+    bet_button.addEventListener('click', function() {
+        potAmount = parseInt(slider.value);
+        pot.innerHTML = potAmount;
+        chipsAmount = chipsAmount - potAmount;
+        chips.innerHTML = chipsAmount;
+        toggleRoundUI("show");
+        gameSetup();
+    });
+
+    document.querySelector(".buy-back").addEventListener('click', function() {
+        document.getElementById("chips-warning-container").classList.add("hidden");
+        chipsAmount = 700;
+        slider.setAttribute("max", `${chipsAmount}`);
+        document.getElementById("bet-amount").innerHTML = slider.value;
+        textInput.value = slider.value;
+        chips.innerHTML = chipsAmount;
+    });
 
     play_again.addEventListener('click', function() {
         play_again.classList.add('hidden');
-        hit_button.classList.remove('hidden');
-        stand_button.classList.remove('hidden');
         win_message.classList.remove('shown');
         win_message.classList.remove('player-won');
         win_message.classList.remove('dealer-won');
         win_message.classList.remove('tie');
+        betting.classList.remove('hidden');
+        pot.innerHTML = 0;
+        if (chipsAmount == 0){
+            document.getElementById("chips-warning-container").classList.remove("hidden");
+        } else {
+            slider.setAttribute("max", `${chipsAmount}`);
+        }
+        document.getElementById("bet-amount").innerHTML = slider.value;
+        textInput.value = slider.value;
         player_total.classList = [];
         blackjack_message.innerHTML = '';
         playerTotal = 0;
@@ -100,8 +159,14 @@ document.querySelector('.play').addEventListener('click', async function() {
         playerHand = [];
         dealerHand = [];
         dealer_total.innerHTML = "??";
-        gameSetup();
+        for (var i = 0; i<8;i++){
+            document.getElementById("player-card"+i).innerHTML = '';
+            document.getElementById("dealer-card"+i).innerHTML = '';
+        }
+        toggleRoundUI("hide");
     });
+
+    
 
     hit_button.addEventListener('click', function() {
         playerTotal = hit(playerHand, playerTotal);
@@ -115,11 +180,38 @@ document.querySelector('.play').addEventListener('click', async function() {
         }
     });
 
+    double_down.addEventListener('click', function() {
+        chipsAmount -= potAmount;
+        potAmount += potAmount;
+        pot.innerHTML = potAmount;
+        chips.innerHTML = chipsAmount;
+        player_side.removeChild(double_down);
+        playerTotal = hit(playerHand, playerTotal);
+        updateScreen();
+        if (playerTotal > 21) {
+            win("dealer");
+            player_total.classList.add('bust');
+            showDealerCard();
+        } else {
+            dealerTurn();
+        }
+    });
+
     stand_button.addEventListener('click', function() {
         dealerTurn();
     });
     
-    gameSetup();
+    function toggleRoundUI(toggle) {
+        if (toggle==="hide"){
+            player_side.classList.add('hidden');
+            document.querySelector('.dealer-total').classList.add('hidden');
+        } else {
+            player_side.classList.remove('hidden');
+            document.querySelector('.dealer-total').classList.remove('hidden');
+            hit_button.classList.remove("hidden");
+            stand_button.classList.remove("hidden");
+        }
+    }
 
     function shuffle(){
         var tempDeck = [];
@@ -139,12 +231,16 @@ document.querySelector('.play').addEventListener('click', async function() {
             hand[0].value = 11;
             hand[1].value = 1;
         }
+        let total = hand[0].value + hand[1].value;
         if (player == "player"){
             playerHand = hand;
+            if ((total==9 || total==10 || total==11) && chipsAmount>=potAmount){
+                hit_button.before(double_down);
+            }
         } else {
             dealerHand = hand;
         }
-        return hand[0].value + hand[1].value;
+        return total;
     }
 
     function hit(hand, total){
@@ -177,10 +273,8 @@ document.querySelector('.play').addEventListener('click', async function() {
     }
 
     function gameSetup(){
-        for (var i = 0; i<8;i++){
-            document.getElementById("player-card"+i).innerHTML = '';
-            document.getElementById("dealer-card"+i).innerHTML = '';
-        }
+        
+        betting.classList.add('hidden');
 
         gameDeck = structuredClone(deck);
         
@@ -192,6 +286,7 @@ document.querySelector('.play').addEventListener('click', async function() {
         dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
         dealer_card1.innerHTML = `<img src="cardback.png">`;
 
+
         if (playerTotal == 21 && dealerTotal == 21){
             showDealerCard();
             win("tie");
@@ -199,15 +294,20 @@ document.querySelector('.play').addEventListener('click', async function() {
             showDealerCard();
             win("dealer");
         } else if (playerTotal == 21){
+            gotBlackjack = true;
             win("player");
             blackjack_message.innerHTML = "Blackjack!";
             player_total.classList.add('blackjack');
+            slider.setAttribute('step', '5');
         }
     }
 
     function dealerTurn(){
         hit_button.classList.add('hidden');
         stand_button.classList.add('hidden');
+        if (player_side.contains(double_down)){
+            player_side.removeChild(double_down);
+        }
         setTimeout(dealerHit, 1000);
     }
 
@@ -234,27 +334,29 @@ document.querySelector('.play').addEventListener('click', async function() {
     }
 
     function win(winner){    
+        if (player_side.contains(double_down)){
+            player_side.removeChild(double_down);
+        }
         play_again.classList.remove('hidden');
         hit_button.classList.add('hidden');
         stand_button.classList.add('hidden');
         win_message.classList.add('shown');
         if (winner == "player"){
+            if (gotBlackjack){
+                chipsAmount += Math.ceil(2.5*potAmount);
+            } else{
+                chipsAmount += 2*potAmount;
+            }
             win_message.innerHTML = "You won!";
             win_message.classList.add('player-won');
-            playerWins += 1;
-            player_wins.innerHTML = playerWins;
         } else if (winner == "dealer"){
             win_message.innerHTML = "You lost!";
             win_message.classList.add('dealer-won');
-            dealerWins += 1;
-            dealer_wins.innerHTML = dealerWins;
         } else {
             win_message.classList.add('tie');
             win_message.innerHTML = "Tie!";
-            dealerWins += 1;
-            playerWins += 1;
-            player_wins.innerHTML = playerWins;
-            dealer_wins.innerHTML = dealerWins;
+            chipsAmount += potAmount;
         }
+        chips.innerHTML = chipsAmount;
     }
 });

@@ -13,13 +13,20 @@
 
   <div class="center-container">
     <div class="dealer-total">Dealer Total: <span id="dealer-total">??</span></div>
-    <div class="wins-counter">
-      <div>Your Wins: <span id="player-wins">0</span></div>
+    <div class="game-info">
+      <div>Your Chips: <span id="chips">700</span></div>
       <div class="game-result">
+        <div class="betting">
+          <div class="betting-input-container">
+            <input type="range" min="1" max="700" value="20" step="1" class="slider">
+            <input class="text" type="text">
+          </div><br>
+          <button class="bet-button">Place Bet: <span id="bet-amount">20</span></button>
+        </div>
         <div class="win-message">Tie</div>
         <div class="play-again hidden">Play Again</div>
       </div>
-      <div>Dealer Wins: <span id="dealer-wins">0</span></div>
+      <div>Pot: <span id="pot">0</span></div>
     </div>
     <div class="blackjack-message"></div>
     <div class="player-side">
