@@ -167,8 +167,6 @@ document.querySelector('.play').addEventListener('click', async function() {
         toggleRoundUI("hide");
     });
 
-    
-
     hit_button.addEventListener('click', function() {
         playerTotal = hit(playerHand, playerTotal);
         updateScreen();
@@ -286,7 +284,6 @@ document.querySelector('.play').addEventListener('click', async function() {
 
         dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
         dealer_card1.innerHTML = `<img src="cardback.png">`;
-
 
         if (playerTotal == 21 && dealerTotal == 21){
             showDealerCard();
