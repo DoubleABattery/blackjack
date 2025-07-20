@@ -157,20 +157,20 @@ img{
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 23px;
-  height: 23px;
+  width: 30px;
+  height: 30px;
   border: 0;
   border-radius: 50%;
-  background: var(--primary);
+  background: url('chip.png');
   cursor: pointer;
 }
 
 .slider::-moz-range-thumb {
   border-radius: 50%;  
-  width: 23px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
   border: 0;
-  background: var(--primary);
+  background: url('chip.png');
   cursor: pointer;
 }
 
@@ -191,6 +191,7 @@ img{
     align-items: center;
     justify-content: center;
     row-gap: 5px;
+    margin-right: 10px;
 }
 
 .betting-input-container{
