@@ -58,8 +58,8 @@ const deck = [
 var gameDeck;
 var playerHand = [];
 var dealerHand = [];
-var playerTotal;
-var dealerTotal; 
+var playerTotal = 0;
+var dealerTotal = 0;
 var chipsAmount = 700;
 var potAmount = 0;
 var gotBlackjack = false;
@@ -145,7 +145,6 @@ document.querySelector('.play').addEventListener('click', async function() {
         win_message.classList.remove('tie');
         betting.classList.remove('hidden');
         gotBlackjack = false;
-        pot.innerHTML = 0;
         if (chipsAmount == 0){
             document.getElementById("chips-warning-container").classList.remove("hidden");
         } else {
@@ -222,26 +221,6 @@ document.querySelector('.play').addEventListener('click', async function() {
         gameDeck = tempDeck;
     }
 
-    function deal(hand, player){
-        for(var i = 0; i<2; i++){
-            hand.push(gameDeck.pop());
-        }
-        if (hand[0].name=="A" && hand[1].name == "A"){
-            hand[0].value = 11;
-            hand[1].value = 1;
-        }
-        let total = hand[0].value + hand[1].value;
-        if (player == "player"){
-            playerHand = hand;
-            if ((total==9 || total==10 || total==11) && chipsAmount>=potAmount){
-                hit_button.before(double_down);
-            }
-        } else {
-            dealerHand = hand;
-        }
-        return total;
-    }
-
     function hit(hand, total){
         hand.push(gameDeck.pop());
         if (hand[hand.length-1].name=="A" && total>=11){
@@ -266,24 +245,66 @@ document.querySelector('.play').addEventListener('click', async function() {
         player_total.innerHTML = playerTotal;
     }
 
+    function sleep(){
+        return new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
     function showDealerCard(){
         dealer_card1.innerHTML = `<img src="${dealerHand[1].image}">`;
         dealer_total.innerHTML = dealerTotal;
     }
 
-    function gameSetup(){
-        
+    async function gameSetup(){
+        player_total.innerHTML = '';
+        dealer_total.innerHTML = '';
         betting.classList.add('hidden');
+        hit_button.classList.add('hidden');
+        stand_button.classList.add('hidden');
 
         gameDeck = structuredClone(deck);
         
         shuffle();
-        playerTotal =  deal(playerHand, "player");
-        dealerTotal = deal(dealerHand, "dealer");
-        updateScreen();
 
+        for(let i = 0; i<2; i++){
+            playerHand.push(gameDeck.pop());
+            playerTotal+=playerHand[i].value;
+
+            dealerHand.push(gameDeck.pop());
+            dealerTotal+=dealerHand[i].value;
+
+            if (i==1){
+                if (playerHand[0].name=="A" && playerHand[1].name == "A"){
+                    playerHand[0].value = 11;
+                    playerHand[1].value = 1;
+                }
+                if (dealerHand[0].name=="A" && dealerHand[1].name == "A"){
+                    dealerHand[0].value = 11;
+                    dealerHand[1].value = 1;
+                }
+            }
+        }
+
+        await sleep();
+        document.getElementById("player-card0").innerHTML = `<img src="${playerHand[0].image}">`;
+        player_total.innerHTML = playerHand[0].value;
+        await sleep();
         dealer_card0.innerHTML = `<img src="${dealerHand[0].image}">`;
+        dealer_total.innerHTML = dealerHand[0].value;
+
+        await sleep();
+        document.getElementById("player-card1").innerHTML = `<img src="${playerHand[1].image}">`;
+        player_total.innerHTML = playerTotal;
+        await sleep();
         dealer_card1.innerHTML = `<img src="cardback.png">`;
+        dealer_total.innerHTML = '??';
+
+        await sleep();
+        hit_button.classList.remove('hidden');
+        stand_button.classList.remove('hidden');
+
+        if ((playerTotal==9 || playerTotal==10 || playerTotal==11) && chipsAmount>=potAmount){
+            hit_button.before(double_down);
+        }
 
         if (playerTotal == 21 && dealerTotal == 21){
             showDealerCard();
@@ -354,6 +375,7 @@ document.querySelector('.play').addEventListener('click', async function() {
             win_message.innerHTML = "Tie!";
             chipsAmount += potAmount;
         }
+        pot.innerHTML = 0;
         chips.innerHTML = chipsAmount;
     }
 });
