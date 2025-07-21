@@ -267,21 +267,19 @@ document.querySelector('.play').addEventListener('click', async function() {
 
         for(let i = 0; i<2; i++){
             playerHand.push(gameDeck.pop());
-            playerTotal+=playerHand[i].value;
-
             dealerHand.push(gameDeck.pop());
-            dealerTotal+=dealerHand[i].value;
-
+            
             if (i==1){
                 if (playerHand[0].name=="A" && playerHand[1].name == "A"){
-                    playerHand[0].value = 11;
                     playerHand[1].value = 1;
                 }
                 if (dealerHand[0].name=="A" && dealerHand[1].name == "A"){
-                    dealerHand[0].value = 11;
                     dealerHand[1].value = 1;
                 }
             }
+
+            playerTotal+=playerHand[i].value;
+            dealerTotal+=dealerHand[i].value;
         }
 
         await sleep();
