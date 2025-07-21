@@ -226,6 +226,10 @@ img{
     z-index: 10;
 }
 
+.chips-warning p{
+    text-align: center;
+}
+
 .warning-background{
     position: fixed;
     top: 0;
