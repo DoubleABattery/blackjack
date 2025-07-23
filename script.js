@@ -104,7 +104,7 @@ document.querySelector('.play').addEventListener('click', async function() {
 
     textInput.oninput = () => {
         let value = textInput.value;
-        if (isNaN(value)) {
+        if (isNaN(value) && value.length > 0) {
             textInput.value = value.slice(0, -1);
         }
     }
@@ -117,7 +117,6 @@ document.querySelector('.play').addEventListener('click', async function() {
 
     textInput.addEventListener('blur', function() {
         let value = Math.ceil(textInput.value);
-        console.log(typeof value);
         if (value>chipsAmount){
             textInput.value=chipsAmount;
         } else if (value<1){
