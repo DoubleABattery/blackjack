@@ -99,7 +99,14 @@ document.querySelector('.play').addEventListener('click', async function() {
 
     slider.oninput = () => {
         document.getElementById("bet-amount").innerHTML = slider.value;
-        textInput.value = slider.value
+        textInput.value = slider.value;
+    }
+
+    textInput.oninput = () => {
+        let value = textInput.value;
+        if (isNaN(value)) {
+            textInput.value = value.slice(0, -1);
+        }
     }
 
     textInput.addEventListener('keydown', (event) => {
@@ -110,10 +117,11 @@ document.querySelector('.play').addEventListener('click', async function() {
 
     textInput.addEventListener('blur', function() {
         let value = Math.ceil(textInput.value);
+        console.log(typeof value);
         if (value>chipsAmount){
-            textInput.value=chipsAmount
+            textInput.value=chipsAmount;
         } else if (value<1){
-            textInput.value=1
+            textInput.value=1;
         }
         document.getElementById("bet-amount").innerHTML = textInput.value;
         slider.value = textInput.value;
@@ -167,6 +175,9 @@ document.querySelector('.play').addEventListener('click', async function() {
     });
 
     hit_button.addEventListener('click', function() {
+        if (player_side.contains(double_down)){
+            player_side.removeChild(double_down);
+        }
         playerTotal = hit(playerHand, playerTotal);
         updateScreen();
         if (playerTotal > 21) {
@@ -268,7 +279,7 @@ document.querySelector('.play').addEventListener('click', async function() {
         for(let i = 0; i<2; i++){
             playerHand.push(gameDeck.pop());
             dealerHand.push(gameDeck.pop());
-            
+
             if (i==1){
                 if (playerHand[0].name=="A" && playerHand[1].name == "A"){
                     playerHand[1].value = 1;
