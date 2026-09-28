@@ -309,7 +309,9 @@ document.querySelector('.play').addEventListener('click', async function () {
     await sleep();
     hit_button.classList.remove('hidden');
     stand_button.classList.remove('hidden');
-    player_side.prepend(double_down);
+    if (chipsAmount >= potAmount) {
+      player_side.prepend(double_down);
+    }
 
     if ((playerTotal == 9 || playerTotal == 10 || playerTotal == 11) && chipsAmount >= potAmount) {
       hit_button.before(double_down);
